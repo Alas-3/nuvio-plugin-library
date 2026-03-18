@@ -9,8 +9,25 @@ export const useNotionProviders = (pageId: string) => {
   useEffect(() => {
     const fetchProviders = async () => {
       try {
-        const targetUrl = encodeURIComponent(`https://notion-api.splitbee.io/v1/page/${pageId}`);
-        const response = await fetch(`https://corsproxy.io/?url=${targetUrl}`);
+        // DDoS / Spam protection: Check local storage cache (10 minutes)
+        const CACHE_KEY = `nuvio_providers_${pageId}`;
+        const CACHE_TIME_MS = 10 * 60 * 1000;
+        const cachedStr = localStorage.getItem(CACHE_KEY);
+        
+        if (cachedStr) {
+          try {
+            const cached = JSON.parse(cachedStr);
+            if (Date.now() - cached.timestamp < CACHE_TIME_MS) {
+              setProviders(cached.data);
+              setLoading(false);
+              return; // End early, avoid external ping!
+            }
+          } catch (e) {
+            // Ignore corrupted cache
+          }
+        }
+
+        const response = await fetch(`/api/notion/${pageId}`);
         if (!response.ok) throw new Error('Failed to fetch Notion data');
         const data = await response.json();
         
@@ -70,6 +87,15 @@ export const useNotionProviders = (pageId: string) => {
               tags: [language]
             });
           }
+        }
+
+        try {
+          localStorage.setItem(CACHE_KEY, JSON.stringify({
+            timestamp: Date.now(),
+            data: parsedProviders
+          }));
+        } catch (storageErr) {
+          // Fallback if user's browser blocks local storage
         }
 
         setProviders(parsedProviders);

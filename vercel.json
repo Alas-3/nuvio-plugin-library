@@ -1,0 +1,12 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/notion/:pageId",
+      "destination": "https://notion-api.splitbee.io/v1/page/:pageId"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
