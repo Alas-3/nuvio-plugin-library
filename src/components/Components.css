@@ -122,6 +122,10 @@
   width: 16%;
 }
 
+.provider-table thead th:nth-child(4) {
+  text-align: right;
+}
+
 .provider-table thead th {
   text-align: left;
   padding: 18px 20px;
@@ -173,6 +177,31 @@
   white-space: nowrap;
   text-align: right;
   vertical-align: middle;
+}
+
+@media (min-width: 769px) {
+  .provider-table thead th:nth-child(4),
+  .provider-table td:nth-child(4) {
+    text-align: left;
+    padding-right: 20px;
+    padding-left: 20px;
+    vertical-align: middle;
+  }
+
+  .provider-table thead th:nth-child(4) {
+    padding-left: 32.5px;
+  }
+
+  .provider-action-cell {
+    text-align: left;
+  }
+
+  .provider-action-cell .add-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+  }
 }
 
 .mobile-meta-inline {
@@ -312,6 +341,11 @@
     width: 26%;
   }
 
+  .provider-table thead th:nth-child(4) {
+    text-align: right;
+    padding-right: 12px;
+  }
+
   .provider-author-col,
   .provider-tags-col {
     display: none;
@@ -352,6 +386,7 @@
     display: inline-flex;
     justify-content: center;
     align-items: center;
+    margin-top: 6px;
     padding: clamp(7px, 1.8vw, 9px) clamp(8px, 2.2vw, 10px);
     font-size: clamp(0.66rem, 2.05vw, 0.8rem);
     line-height: 1.2;
@@ -390,6 +425,10 @@
     width: 28%;
   }
 
+  .provider-table thead th:nth-child(4) {
+    padding-right: 23px;
+  }
+
   .provider-name-cell {
     font-size: clamp(0.76rem, 3.2vw, 0.84rem);
   }
@@ -404,6 +443,7 @@
   }
 
   .provider-action-cell .add-button {
+    margin-top: 5px;
     padding: 6px 7px;
     font-size: clamp(0.62rem, 2.5vw, 0.7rem);
     min-width: 64px;
