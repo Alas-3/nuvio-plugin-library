@@ -344,6 +344,7 @@
   .provider-table thead th:nth-child(4) {
     text-align: right;
     padding-right: 12px;
+    color: transparent;
   }
 
   .provider-author-col,
