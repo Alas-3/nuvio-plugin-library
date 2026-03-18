@@ -1,0 +1,50 @@
+[
+  {
+    "id": "1",
+    "name": "Nuvio Search",
+    "description": "Advanced search capabilities using LLMs to safely index and retrieve your Notion pages.",
+    "author": "Nuvio Inc",
+    "url": "sora://default_page?url=https%3A%2F%2Fexample.com",
+    "tags": ["Search", "AI"]
+  },
+  {
+    "id": "2",
+    "name": "TaskFlow Sync",
+    "description": "Bidirectional sync between your Notion tasks and external project management tools with beautiful status indicators in your library.",
+    "author": "DevTools Co",
+    "url": "https://example.com/sync",
+    "tags": ["Sync", "Productivity"]
+  },
+  {
+    "id": "3",
+    "name": "Zen Writer",
+    "description": "A minimalist distraction-free writing environment plugin for your Notion blocks.",
+    "author": "Design Studio",
+    "url": "sora://default_page?url=https%3A%2F%2Fexample.com",
+    "tags": ["Writing", "Minimalist"]
+  },
+  {
+    "id": "4",
+    "name": "Analytics Dash",
+    "description": "Embed privacy-first, beautifully styled analytics directly into your public Notion pages.",
+    "author": "Data Insights",
+    "url": "https://example.com/analytics",
+    "tags": ["Analytics", "Graphs"]
+  },
+  {
+    "id": "5",
+    "name": "Manga Tracker",
+    "description": "Track your manga reading progress natively inside Notion tables with automatic cover fetching.",
+    "author": "Otaku Dev",
+    "url": "sora://default_page?url=https%3A%2F%2Fexample.com",
+    "tags": ["Tracking", "Media"]
+  },
+  {
+    "id": "6",
+    "name": "Code Snippet Pro",
+    "description": "Enhanced syntax highlighting and execution for code blocks in Notion, securely running in a sandbox environment.",
+    "author": "CodeCrafters",
+    "url": "https://example.com/code",
+    "tags": ["Developer", "Utility"]
+  }
+]
