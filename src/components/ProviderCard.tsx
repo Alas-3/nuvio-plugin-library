@@ -31,7 +31,7 @@ export const ProviderCard = ({ provider, delayMs }: ProviderCardProps) => {
           <span className="provider-author">by {provider.author}</span>
         </div>
       </div>
-      <p className="provider-desc">{provider.description}</p>
+      {provider.description && <p className="provider-desc">{provider.description}</p>}
       <div className="provider-footer">
         <div className="provider-tags">
           {provider.tags.map(tag => (

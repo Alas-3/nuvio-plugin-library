@@ -10,7 +10,7 @@ export const useNotionProviders = (pageId: string) => {
     const fetchProviders = async () => {
       try {
         // DDoS / Spam protection: Check local storage cache (10 minutes)
-        const CACHE_KEY = `nuvio_providers_${pageId}`;
+        const CACHE_KEY = `nuvio_providers_v2_${pageId}`;
         const CACHE_TIME_MS = 10 * 60 * 1000;
         const cachedStr = localStorage.getItem(CACHE_KEY);
         
@@ -81,7 +81,7 @@ export const useNotionProviders = (pageId: string) => {
             parsedProviders.push({
               id: tableRows[i].id,
               name,
-              description: `A plugin repository module providing extensions. Language support: ${language}.`,
+              description: '',
               author,
               url,
               tags: [language]
