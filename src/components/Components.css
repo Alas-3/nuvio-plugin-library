@@ -282,6 +282,22 @@
   border-top: 1px solid var(--surface-border);
 }
 
+.footer-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--transition-fast), opacity var(--transition-fast);
+}
+
+.footer-name {
+  color: var(--text-primary);
+}
+
+.footer-link:hover {
+  border-bottom-color: var(--text-primary);
+  opacity: 0.9;
+}
+
 @media (max-width: 768px) {
   .hero-subtitle {
     font-size: clamp(0.95rem, 3vw + 0.1rem, 1.1rem);
