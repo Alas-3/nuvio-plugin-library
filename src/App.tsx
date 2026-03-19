@@ -8,20 +8,40 @@ import { useNotionProviders } from './hooks/useNotionProviders';
 // The Notion Page ID containing the plugin table
 const NOTION_PAGE_ID = '326981dcb87e80f6b9f6f23469a00fd3';
 
+const normalizeText = (value: string) =>
+  value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const { providers, loading, error } = useNotionProviders(NOTION_PAGE_ID);
 
   const filteredProviders = useMemo(() => {
-    if (!searchQuery.trim()) return providers;
-    
-    const query = searchQuery.toLowerCase();
-    return providers.filter(p => 
-      p.name.toLowerCase().includes(query) ||
-      p.description.toLowerCase().includes(query) ||
-      p.author.toLowerCase().includes(query) ||
-      p.tags.some(tag => tag.toLowerCase().includes(query))
-    );
+    const normalizedQuery = normalizeText(searchQuery);
+    if (!normalizedQuery) return providers;
+
+    return providers
+      .map((provider) => {
+        const normalizedName = normalizeText(provider.name);
+        if (!normalizedName.includes(normalizedQuery)) {
+          return null;
+        }
+
+        let score = 0;
+        if (normalizedName === normalizedQuery) score += 200;
+        if (normalizedName.startsWith(normalizedQuery)) score += 100;
+        score += Math.max(0, 60 - normalizedName.indexOf(normalizedQuery));
+
+        return { provider, score };
+      })
+      .filter((entry): entry is { provider: (typeof providers)[number]; score: number } => entry !== null)
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.provider);
   }, [searchQuery, providers]);
 
   return (

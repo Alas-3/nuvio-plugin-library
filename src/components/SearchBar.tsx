@@ -12,7 +12,7 @@ export const SearchBar = ({ value, onChange }: SearchBarProps) => {
       <input
         type="text"
         className="search-input"
-        placeholder="Search plugins by name, author, or tag..."
+        placeholder="Search plugins by name..."
         value={value}
         onChange={onChange}
       />

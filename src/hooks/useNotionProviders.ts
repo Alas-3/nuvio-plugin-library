@@ -1,5 +1,43 @@
 import { useState, useEffect } from 'react';
-import type { Provider } from '../types';
+import type { Provider, ScraperInfo } from '../types';
+
+const toManifestUrl = (rawUrl: string): string => {
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return '';
+  if (trimmed.endsWith('/manifest.json')) return trimmed;
+  if (trimmed.endsWith('/')) return `${trimmed}manifest.json`;
+  return trimmed;
+};
+
+const parseStringArray = (value: unknown): string[] => {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string');
+};
+
+const fetchScrapersFromManifest = async (manifestUrl: string): Promise<ScraperInfo[]> => {
+  if (!manifestUrl) return [];
+
+  try {
+    const response = await fetch(manifestUrl);
+    if (!response.ok) return [];
+
+    const manifest = await response.json();
+    const scrapers = Array.isArray(manifest?.scrapers) ? manifest.scrapers : [];
+
+    return scrapers
+      .filter((scraper: any) => scraper && typeof scraper === 'object')
+      .map((scraper: any, index: number): ScraperInfo => ({
+        id: typeof scraper.id === 'string' ? scraper.id : `${manifestUrl}-${index}`,
+        name: typeof scraper.name === 'string' ? scraper.name : 'Unnamed scraper',
+        description: typeof scraper.description === 'string' ? scraper.description : '',
+        supportedTypes: parseStringArray(scraper.supportedTypes),
+        contentLanguage: parseStringArray(scraper.contentLanguage),
+        logo: typeof scraper.logo === 'string' ? scraper.logo : '',
+      }));
+  } catch {
+    return [];
+  }
+};
 
 export const useNotionProviders = (pageId: string) => {
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -66,12 +104,25 @@ export const useNotionProviders = (pageId: string) => {
               description: '',
               author,
               url,
-              tags: [language]
+              tags: [language],
+              scrapers: []
             });
           }
         }
 
-        setProviders(parsedProviders);
+        const providersWithScrapers = await Promise.all(
+          parsedProviders.map(async (provider) => {
+            const manifestUrl = toManifestUrl(provider.url);
+            const scrapers = await fetchScrapersFromManifest(manifestUrl);
+            return {
+              ...provider,
+              url: manifestUrl,
+              scrapers,
+            };
+          })
+        );
+
+        setProviders(providersWithScrapers);
       } catch (err: any) {
         setError(err.message);
       } finally {

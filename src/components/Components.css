@@ -168,6 +168,167 @@
   overflow-wrap: anywhere;
 }
 
+.provider-name-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.provider-row-clickable {
+  cursor: pointer;
+}
+
+.provider-row-clickable:focus-visible {
+  outline: 2px solid rgba(10, 132, 255, 0.55);
+  outline-offset: -2px;
+}
+
+.provider-row-clickable.is-expanded {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.expand-toggle {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.provider-row-clickable:hover .expand-toggle {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.expand-toggle-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.expand-toggle-icon path {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.expand-toggle.expanded {
+  transform: rotate(90deg);
+  border-color: rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.11);
+}
+
+.expand-toggle.expanded .expand-toggle-icon path,
+.provider-row-clickable:hover .expand-toggle-icon path {
+  stroke: var(--text-primary);
+}
+
+.provider-details-row td {
+  background: rgba(255, 255, 255, 0.02);
+  padding-top: 14px;
+  padding-bottom: 16px;
+}
+
+.provider-details-wrap {
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding-left: 14px;
+}
+
+.scraper-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr;
+}
+
+.scraper-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scraper-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+
+.scraper-logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  flex-shrink: 0;
+}
+
+.scraper-logo-fallback {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.scraper-name {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+  line-height: 1.25;
+}
+
+.scraper-desc {
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.scraper-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 7px;
+  color: var(--text-tertiary);
+  font-size: 0.76rem;
+}
+
+.scraper-meta-label {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.scraper-empty {
+  color: var(--text-tertiary);
+  font-size: 0.88rem;
+}
+
+@media (min-width: 1100px) {
+  .scraper-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+}
+
 .provider-author-cell {
   color: var(--text-tertiary);
   overflow-wrap: anywhere;
@@ -282,6 +443,23 @@
   border-top: 1px solid var(--surface-border);
 }
 
+.footer-callout {
+  margin: 0 0 14px;
+  color: var(--text-secondary);
+}
+
+.footer-discord-link {
+  color: #FFFFFF;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1.5px;
+  transition: opacity var(--transition-fast);
+}
+
+.footer-discord-link:hover {
+  opacity: 0.85;
+}
+
 .footer-link {
   color: var(--text-primary);
   text-decoration: none;
@@ -371,6 +549,51 @@
   .provider-name-cell {
     font-size: clamp(0.82rem, 2.55vw, 0.96rem);
     line-height: 1.35;
+  }
+
+  .provider-name-row {
+    gap: 8px;
+  }
+
+  .expand-toggle {
+    width: 20px;
+    height: 20px;
+  }
+
+  .expand-toggle-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  .provider-details-wrap {
+    padding-left: 10px;
+    max-height: 52vh;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .scraper-item {
+    padding: 10px;
+  }
+
+  .scraper-name {
+    font-size: 0.86rem;
+  }
+
+  .scraper-logo,
+  .scraper-logo-fallback {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+
+  .scraper-desc {
+    font-size: 0.76rem;
+  }
+
+  .scraper-meta {
+    font-size: 0.68rem;
+    gap: 6px;
   }
 
   .mobile-meta-inline {
