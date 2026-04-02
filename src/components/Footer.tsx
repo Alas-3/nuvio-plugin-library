@@ -4,16 +4,16 @@ export const Footer = () => {
   return (
     <footer className="footer animate-fade-in" style={{ animationDelay: '300ms' }}>
       <p className="footer-callout">
-        Know a plugin we&apos;re missing? Click{' '}
+        Want a plugin added? Join the{' '}
         <a
           className="footer-discord-link"
-          href="https://discord.com/users/709281623866081300"
+          href="https://discord.gg/Nps9Ye2HNs"
           target="_blank"
           rel="noopener noreferrer"
         >
-          here
+          Discord
         </a>{' '}
-        and message me.
+        and ping @wolfknight5555.
       </p>
       <p>
         Developed by <span className="footer-name">wolf knight</span> and{' '}
