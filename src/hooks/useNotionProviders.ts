@@ -1,6 +1,94 @@
 import { useState, useEffect } from 'react';
 import type { Provider, ScraperInfo } from '../types';
 
+type NotionRecord = Record<string, unknown>;
+
+interface NotionBlock {
+  id: string;
+  type: string;
+  properties?: Record<string, unknown>;
+  content?: string[];
+}
+
+const getObject = (value: unknown): NotionRecord | null => {
+  if (!value || typeof value !== 'object') return null;
+  return value as NotionRecord;
+};
+
+const unwrapBlock = (entry: unknown): NotionBlock | null => {
+  const level1 = getObject(entry);
+  if (!level1) return null;
+
+  const level2 = getObject(level1.value);
+  const level3 = level2 ? getObject(level2.value) : null;
+
+  const candidate = level3 ?? level2 ?? level1;
+  if (!candidate || typeof candidate.type !== 'string') {
+    return null;
+  }
+
+  return candidate as unknown as NotionBlock;
+};
+
+const getCellText = (cell: unknown): string => {
+  if (!Array.isArray(cell)) return '';
+
+  return cell
+    .map((chunk) => (Array.isArray(chunk) && typeof chunk[0] === 'string' ? chunk[0] : ''))
+    .join('')
+    .trim();
+};
+
+const getCellLink = (cell: unknown): string => {
+  if (!Array.isArray(cell)) return '';
+
+  for (const chunk of cell) {
+    if (!Array.isArray(chunk) || !Array.isArray(chunk[1])) continue;
+
+    for (const mark of chunk[1]) {
+      if (Array.isArray(mark) && mark[0] === 'a' && typeof mark[1] === 'string') {
+        return mark[1];
+      }
+    }
+  }
+
+  const plainText = getCellText(cell);
+  return /^https?:\/\//i.test(plainText) ? plainText : '';
+};
+
+const findColumnKeys = (headerRow: Record<string, unknown> = {}) => {
+  let repoKey = '';
+  let langKey = '';
+
+  for (const [key, value] of Object.entries(headerRow)) {
+    const text = getCellText(value).toLowerCase();
+    if (!repoKey && text.includes('repo')) repoKey = key;
+    if (!langKey && text.includes('language')) langKey = key;
+  }
+
+  return { repoKey, langKey };
+};
+
+const extractAuthor = (url: string): string => {
+  if (!url) return 'Community';
+
+  try {
+    const { hostname, pathname } = new URL(url);
+
+    // GitHub raw URLs and standard GitHub URLs store owner as the first path segment.
+    if (hostname.includes('github')) {
+      const segments = pathname.split('/').filter(Boolean);
+      if (segments.length > 0) {
+        return segments[0];
+      }
+    }
+  } catch {
+    // Ignore malformed URLs and keep the fallback author.
+  }
+
+  return 'Community';
+};
+
 const toManifestUrl = (rawUrl: string): string => {
   const trimmed = rawUrl.trim();
   if (!trimmed) return '';
@@ -46,68 +134,64 @@ export const useNotionProviders = (pageId: string) => {
 
   useEffect(() => {
     const fetchProviders = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
         const response = await fetch(`/api/notion/${pageId}`);
         if (!response.ok) throw new Error('Failed to fetch Notion data');
+
         const data = await response.json();
-        
-        const blocks = Object.values(data).map((b: any) => b.value).filter(Boolean);
-        const tableRows = blocks.filter((b: any) => b.type === 'table_row');
-        
+        const blockMap = Object.fromEntries(
+          Object.entries(data)
+            .map(([id, entry]) => [id, unwrapBlock(entry)])
+            .filter(([, block]) => block !== null)
+        ) as Record<string, NotionBlock>;
+
+        const tableBlock = Object.values(blockMap).find((block) => block.type === 'table');
+        const tableRows = Array.isArray(tableBlock?.content)
+          ? tableBlock.content
+              .map((rowId) => blockMap[rowId])
+              .filter((block): block is NotionBlock => Boolean(block) && block.type === 'table_row')
+          : Object.values(blockMap).filter((block) => block.type === 'table_row');
+
         if (tableRows.length < 2) {
           setProviders([]);
-          setLoading(false);
           return;
         }
 
-        const headerRow = tableRows[0].properties;
-        let repoKey = '';
-        let langKey = '';
+        const headerRow = (tableRows[0].properties ?? {}) as Record<string, unknown>;
+        const { repoKey, langKey } = findColumnKeys(headerRow);
 
-        for (const [key, value] of Object.entries(headerRow)) {
-          const text = (value as any)[0][0] as string;
-          if (text.includes('Repo')) repoKey = key;
-          if (text.includes('Language')) langKey = key;
+        if (!repoKey) {
+          throw new Error('Repo column not found in Notion table');
         }
 
         const parsedProviders: Provider[] = [];
 
         for (let i = 1; i < tableRows.length; i++) {
-          const rowProps = tableRows[i].properties;
+          const rowProps = (tableRows[i].properties ?? {}) as Record<string, unknown>;
           if (!rowProps) continue;
 
           const repoCell = rowProps[repoKey];
-          const langCell = rowProps[langKey];
+          const langCell = langKey ? rowProps[langKey] : undefined;
 
-          if (repoCell && repoCell[0]) {
-            const name = repoCell[0][0];
-            let url = '';
-            if (repoCell[0][1] && repoCell[0][1][0][0] === 'a') {
-              url = repoCell[0][1][0][1];
-            }
-            
-            let language = 'Unknown';
-            if (langCell && langCell[0]) {
-               language = langCell[0][0];
-            }
-            
-            // Extract author from GitHub raw URL if possible
-            let author = 'Community';
-            if (url.includes('githubusercontent.com')) {
-               const parts = url.split('/');
-               if (parts.length > 3) author = parts[3];
-            }
+          const name = getCellText(repoCell);
+          if (!name) continue;
 
-            parsedProviders.push({
-              id: tableRows[i].id,
-              name,
-              description: '',
-              author,
-              url,
-              tags: [language],
-              scrapers: []
-            });
-          }
+          const url = getCellLink(repoCell);
+          const language = getCellText(langCell) || 'Unknown';
+          const author = extractAuthor(url);
+
+          parsedProviders.push({
+            id: tableRows[i].id,
+            name,
+            description: '',
+            author,
+            url,
+            tags: [language],
+            scrapers: []
+          });
         }
 
         const providersWithScrapers = await Promise.all(
@@ -123,8 +207,10 @@ export const useNotionProviders = (pageId: string) => {
         );
 
         setProviders(providersWithScrapers);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load providers';
+        setError(message);
+        setProviders([]);
       } finally {
         setLoading(false);
       }
