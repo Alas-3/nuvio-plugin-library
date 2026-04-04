@@ -17,14 +17,9 @@ export const Footer = () => {
       </p>
       <p>
         Developed by <span className="footer-name">wolf knight</span> and{' '}
-        <a
-          className="footer-link"
-          href="https://www.acelabador.me/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <span className="footer-link">
           alasss
-        </a>
+        </span>
       </p>
     </footer>
   );
