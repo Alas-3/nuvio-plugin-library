@@ -12,6 +12,7 @@ interface ProviderCardProps {
 export const ProviderCard = ({ provider, delayMs, onOpenDetails }: ProviderCardProps) => {
   const [copied, setCopied] = useState(false);
   const previewScrapers = provider.scrapers.slice(0, 4);
+  const primaryLanguage = provider.tags[0] || 'Unknown';
 
   const handleCopy = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -44,7 +45,34 @@ export const ProviderCard = ({ provider, delayMs, onOpenDetails }: ProviderCardP
       <div className="provider-mobile-compact" aria-hidden="true">
         <div className="provider-mobile-main">
           <span className="provider-mobile-title">{provider.name}</span>
-          <span className="provider-mobile-sub">{provider.tags[0] || 'Unknown'} • {provider.scrapers.length} scrapers</span>
+          <div className="provider-mobile-info-row">
+            <span className="provider-mobile-language-chip">{primaryLanguage}</span>
+            <div className="provider-mobile-scraper-preview">
+              {previewScrapers.length > 0 ? (
+                previewScrapers.map((scraper) => (
+                  scraper.logo ? (
+                    <img
+                      key={`mobile-${scraper.id}`}
+                      src={scraper.logo}
+                      alt={scraper.name}
+                      className="provider-mobile-scraper-dot"
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      onError={(event) => {
+                        event.currentTarget.style.display = 'none';
+                      }}
+                    />
+                  ) : (
+                    <span key={`mobile-${scraper.id}`} className="provider-mobile-scraper-dot fallback" aria-hidden="true">
+                      {scraper.name.charAt(0).toUpperCase()}
+                    </span>
+                  )
+                ))
+              ) : (
+                <span className="provider-mobile-sub">No scrapers</span>
+              )}
+            </div>
+          </div>
         </div>
         <span className="provider-mobile-arrow">→</span>
       </div>
@@ -54,6 +82,7 @@ export const ProviderCard = ({ provider, delayMs, onOpenDetails }: ProviderCardP
           <h3 className="provider-title">{provider.name}</h3>
           <span className="provider-author">by {provider.author}</span>
         </div>
+        <span className="provider-metric">{primaryLanguage}</span>
       </header>
 
       {provider.description && <p className="provider-desc">{provider.description}</p>}
@@ -84,15 +113,8 @@ export const ProviderCard = ({ provider, delayMs, onOpenDetails }: ProviderCardP
         )}
       </div>
 
-      <div className="provider-tags">
-        {provider.tags.map((tag) => (
-          <span key={tag} className="tag">{tag}</span>
-        ))}
-      </div>
-
       <div className="provider-meta-row">
         <span>{provider.scrapers.length} scraper{provider.scrapers.length === 1 ? '' : 's'}</span>
-        <span>{provider.author}</span>
       </div>
 
       <div className="provider-footer">

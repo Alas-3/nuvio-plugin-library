@@ -123,10 +123,27 @@ export const ProviderDetailsModal = ({
                   </div>
                   {scraper.description && <div className="scraper-desc">{scraper.description}</div>}
                   <div className="scraper-meta">
-                    <span className="scraper-meta-label">Types:</span>
-                    <span>{scraper.supportedTypes.length > 0 ? scraper.supportedTypes.join(', ') : 'Unknown'}</span>
-                    <span className="scraper-meta-label">Language:</span>
-                    <span>{scraper.contentLanguage.length > 0 ? scraper.contentLanguage.join(', ') : 'Unknown'}</span>
+                    <div className="scraper-meta-group">
+                      <span className="scraper-meta-label">Types:</span>
+                      <div className="scraper-meta-badges">
+                        {(scraper.supportedTypes.length > 0 ? scraper.supportedTypes : ['Unknown']).map((type) => (
+                          <span key={`${scraper.id}-type-${type}`} className="scraper-meta-badge">
+                            {type}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="scraper-meta-group">
+                      <span className="scraper-meta-label">Language:</span>
+                      <div className="scraper-meta-badges">
+                        {(scraper.contentLanguage.length > 0 ? scraper.contentLanguage : ['Unknown']).map((language) => (
+                          <span key={`${scraper.id}-lang-${language}`} className="scraper-meta-badge">
+                            {language}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 </li>
               ))}

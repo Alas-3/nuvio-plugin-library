@@ -20,7 +20,7 @@ export const HeroSection = ({ totalProviders, totalScrapers }: HeroSectionProps)
           aria-label="Download Nuvio"
         >
           <FaDownload aria-hidden="true" />
-          Download
+          Download Nuvio
         </a>
         <a
           className="eyebrow hero-eyebrow hero-link-badge"
