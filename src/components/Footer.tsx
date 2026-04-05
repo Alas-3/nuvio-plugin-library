@@ -16,7 +16,7 @@ export const Footer = () => {
         community and post your manifest URL.
       </p>
       <p>
-        Built by <span className="footer-name">wolf knight</span> and <span className="footer-name">alasss</span>
+        Built by <span className="footer-name">wolf knight</span>, <span className="footer-name">Svznify</span> and <span className="footer-name">alasss</span>
         {' '}for the Nuvio ecosystem.
       </p>
     </footer>
