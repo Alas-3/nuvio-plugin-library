@@ -2,9 +2,9 @@ import './Components.css';
 
 export const Footer = () => {
   return (
-    <footer className="footer animate-fade-in" style={{ animationDelay: '300ms' }}>
+    <footer className="footer animate-fade-in" style={{ animationDelay: '280ms' }}>
       <p className="footer-callout">
-        Want a plugin added? Join the{' '}
+        Have a provider to share? Join the{' '}
         <a
           className="footer-discord-link"
           href="https://discord.gg/Nps9Ye2HNs"
@@ -13,13 +13,11 @@ export const Footer = () => {
         >
           Discord
         </a>{' '}
-        and ping @wolfknight5555.
+        community and post your manifest URL.
       </p>
       <p>
-        Developed by <span className="footer-name">wolf knight</span> and{' '}
-        <span className="footer-link">
-          alasss
-        </span>
+        Built by <span className="footer-name">wolf knight</span> and <span className="footer-name">alasss</span>
+        {' '}for the Nuvio ecosystem.
       </p>
     </footer>
   );

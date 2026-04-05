@@ -10,6 +10,19 @@ interface NotionBlock {
   content?: string[];
 }
 
+interface ManifestScraperRecord {
+  id?: unknown;
+  name?: unknown;
+  description?: unknown;
+  supportedTypes?: unknown;
+  contentLanguage?: unknown;
+  logo?: unknown;
+}
+
+interface ManifestRecord {
+  scrapers?: unknown;
+}
+
 const getObject = (value: unknown): NotionRecord | null => {
   if (!value || typeof value !== 'object') return null;
   return value as NotionRecord;
@@ -89,6 +102,67 @@ const extractAuthor = (url: string): string => {
   return 'Community';
 };
 
+const countryByTld: Record<string, { code: string; name: string; emoji: string }> = {
+  us: { code: 'US', name: 'United States', emoji: '🇺🇸' },
+  uk: { code: 'GB', name: 'United Kingdom', emoji: '🇬🇧' },
+  de: { code: 'DE', name: 'Germany', emoji: '🇩🇪' },
+  fr: { code: 'FR', name: 'France', emoji: '🇫🇷' },
+  es: { code: 'ES', name: 'Spain', emoji: '🇪🇸' },
+  it: { code: 'IT', name: 'Italy', emoji: '🇮🇹' },
+  nl: { code: 'NL', name: 'Netherlands', emoji: '🇳🇱' },
+  pl: { code: 'PL', name: 'Poland', emoji: '🇵🇱' },
+  se: { code: 'SE', name: 'Sweden', emoji: '🇸🇪' },
+  no: { code: 'NO', name: 'Norway', emoji: '🇳🇴' },
+  fi: { code: 'FI', name: 'Finland', emoji: '🇫🇮' },
+  dk: { code: 'DK', name: 'Denmark', emoji: '🇩🇰' },
+  ch: { code: 'CH', name: 'Switzerland', emoji: '🇨🇭' },
+  at: { code: 'AT', name: 'Austria', emoji: '🇦🇹' },
+  ie: { code: 'IE', name: 'Ireland', emoji: '🇮🇪' },
+  pt: { code: 'PT', name: 'Portugal', emoji: '🇵🇹' },
+  cz: { code: 'CZ', name: 'Czechia', emoji: '🇨🇿' },
+  tr: { code: 'TR', name: 'Turkey', emoji: '🇹🇷' },
+  in: { code: 'IN', name: 'India', emoji: '🇮🇳' },
+  jp: { code: 'JP', name: 'Japan', emoji: '🇯🇵' },
+  kr: { code: 'KR', name: 'South Korea', emoji: '🇰🇷' },
+  cn: { code: 'CN', name: 'China', emoji: '🇨🇳' },
+  tw: { code: 'TW', name: 'Taiwan', emoji: '🇹🇼' },
+  hk: { code: 'HK', name: 'Hong Kong', emoji: '🇭🇰' },
+  sg: { code: 'SG', name: 'Singapore', emoji: '🇸🇬' },
+  au: { code: 'AU', name: 'Australia', emoji: '🇦🇺' },
+  nz: { code: 'NZ', name: 'New Zealand', emoji: '🇳🇿' },
+  ca: { code: 'CA', name: 'Canada', emoji: '🇨🇦' },
+  br: { code: 'BR', name: 'Brazil', emoji: '🇧🇷' },
+  ar: { code: 'AR', name: 'Argentina', emoji: '🇦🇷' },
+  mx: { code: 'MX', name: 'Mexico', emoji: '🇲🇽' },
+  za: { code: 'ZA', name: 'South Africa', emoji: '🇿🇦' },
+};
+
+const inferCountry = (url: string) => {
+  if (!url) {
+    return { countryCode: 'GL', countryName: 'Global', countryEmoji: '🌍' };
+  }
+
+  try {
+    const { hostname } = new URL(url);
+
+    const pieces = hostname.split('.').filter(Boolean);
+    const tld = pieces[pieces.length - 1]?.toLowerCase() ?? '';
+    const inferred = countryByTld[tld];
+
+    if (inferred) {
+      return {
+        countryCode: inferred.code,
+        countryName: inferred.name,
+        countryEmoji: inferred.emoji,
+      };
+    }
+  } catch {
+    // Ignore URL parsing errors and use global fallback.
+  }
+
+  return { countryCode: 'GL', countryName: 'Global', countryEmoji: '🌍' };
+};
+
 const toManifestUrl = (rawUrl: string): string => {
   const trimmed = rawUrl.trim();
   if (!trimmed) return '';
@@ -102,6 +176,9 @@ const parseStringArray = (value: unknown): string[] => {
   return value.filter((item): item is string => typeof item === 'string');
 };
 
+const isManifestScraperRecord = (value: unknown): value is ManifestScraperRecord =>
+  Boolean(value) && typeof value === 'object';
+
 const fetchScrapersFromManifest = async (manifestUrl: string): Promise<ScraperInfo[]> => {
   if (!manifestUrl) return [];
 
@@ -109,12 +186,12 @@ const fetchScrapersFromManifest = async (manifestUrl: string): Promise<ScraperIn
     const response = await fetch(manifestUrl);
     if (!response.ok) return [];
 
-    const manifest = await response.json();
+    const manifest = (await response.json()) as ManifestRecord;
     const scrapers = Array.isArray(manifest?.scrapers) ? manifest.scrapers : [];
 
     return scrapers
-      .filter((scraper: any) => scraper && typeof scraper === 'object')
-      .map((scraper: any, index: number): ScraperInfo => ({
+      .filter(isManifestScraperRecord)
+      .map((scraper, index): ScraperInfo => ({
         id: typeof scraper.id === 'string' ? scraper.id : `${manifestUrl}-${index}`,
         name: typeof scraper.name === 'string' ? scraper.name : 'Unnamed scraper',
         description: typeof scraper.description === 'string' ? scraper.description : '',
@@ -133,6 +210,8 @@ export const useNotionProviders = (pageId: string) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isCancelled = false;
+
     const fetchProviders = async () => {
       setLoading(true);
       setError(null);
@@ -156,7 +235,9 @@ export const useNotionProviders = (pageId: string) => {
           : Object.values(blockMap).filter((block) => block.type === 'table_row');
 
         if (tableRows.length < 2) {
-          setProviders([]);
+          if (!isCancelled) {
+            setProviders([]);
+          }
           return;
         }
 
@@ -182,6 +263,7 @@ export const useNotionProviders = (pageId: string) => {
           const url = getCellLink(repoCell);
           const language = getCellText(langCell) || 'Unknown';
           const author = extractAuthor(url);
+          const country = inferCountry(url);
 
           parsedProviders.push({
             id: tableRows[i].id,
@@ -189,6 +271,9 @@ export const useNotionProviders = (pageId: string) => {
             description: '',
             author,
             url,
+            countryCode: country.countryCode,
+            countryName: country.countryName,
+            countryEmoji: country.countryEmoji,
             tags: [language],
             scrapers: []
           });
@@ -206,17 +291,27 @@ export const useNotionProviders = (pageId: string) => {
           })
         );
 
-        setProviders(providersWithScrapers);
+        if (!isCancelled) {
+          setProviders(providersWithScrapers);
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Failed to load providers';
-        setError(message);
-        setProviders([]);
+        if (!isCancelled) {
+          setError(message);
+          setProviders([]);
+        }
       } finally {
-        setLoading(false);
+        if (!isCancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchProviders();
+
+    return () => {
+      isCancelled = true;
+    };
   }, [pageId]);
 
   return { providers, loading, error };

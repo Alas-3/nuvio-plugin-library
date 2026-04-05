@@ -1,73 +1,138 @@
-# React + TypeScript + Vite
+# Nuvio Plugin Library
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, searchable directory of Nuvio plugin providers and their scraper manifests.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Live provider sync from the official Notion source page
+- Fast search across plugin name, author, and language tags
+- Sort by relevance, name, author, or scraper count
+- One-click manifest copy with direct open action
+- Responsive layout optimized for desktop and mobile
+- Expandable scraper details for each provider
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite 8
+- ESLint 9
+- Bun or npm for package management
 
-## Expanding the ESLint configuration
+## Prerequisites
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- Node.js 20+
+- Bun (recommended) or npm
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Local Development
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### 1. Install dependencies
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+With Bun:
+
+```bash
+bun install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+With npm:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm install
+```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 2. Run the app
+
+With Bun:
+
+```bash
+bun run dev
+```
+
+With npm:
+
+```bash
+npm run dev
+```
+
+Then open the URL shown by Vite (usually http://localhost:5173).
+
+## Build and Preview
+
+### Production build
+
+With Bun:
+
+```bash
+bun run build
+```
+
+With npm:
+
+```bash
+npm run build
+```
+
+### Preview the production output
+
+With Bun:
+
+```bash
+bun run preview
+```
+
+With npm:
+
+```bash
+npm run preview
+```
+
+## Linting
+
+With Bun:
+
+```bash
+bun run lint
+```
+
+With npm:
+
+```bash
+npm run lint
+```
+
+## How Provider Data Works
+
+- The app pulls table data from a Notion page through `/api/notion/:pageId`
+- It discovers plugin repository/manifest URLs from that table
+- For each provider, it fetches `manifest.json` and extracts scraper metadata
+- The UI renders providers and scrapers dynamically from live data
+
+## Deploying
+
+This project includes [vercel.json](vercel.json) rewrite rules for both API and SPA routing.
+
+Quick deploy flow:
+
+1. Push the repository to GitHub.
+2. Import the project in Vercel.
+3. Keep the default Vite build command (`vite build`) through package scripts.
+4. Deploy.
+
+## Provider Submission Tips
+
+To make a provider list entry useful:
+
+1. Ensure the manifest URL is valid and publicly reachable.
+2. Add clear scraper names and descriptions.
+3. Include `supportedTypes` and `contentLanguage` in every scraper.
+4. Keep logos lightweight and stable (PNG or SVG URLs).
+
+## Project Structure
+
+```text
+src/
+  components/      # UI sections and cards
+  hooks/           # Notion + manifest fetching logic
+  data/            # Local sample data
+  types.ts         # Shared TypeScript types
+  App.tsx          # Main page composition
 ```

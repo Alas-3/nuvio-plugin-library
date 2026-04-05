@@ -13,6 +13,9 @@ export interface Provider {
   description: string;
   author: string;
   url: string;
+  countryCode: string;
+  countryName: string;
+  countryEmoji: string;
   tags: string[];
   scrapers: ScraperInfo[];
 }
