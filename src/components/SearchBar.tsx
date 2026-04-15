@@ -1,11 +1,12 @@
 import type { ChangeEvent } from 'react';
 import './Components.css';
 
-type SortOption = 'relevance' | 'name' | 'author' | 'scrapers';
+type SortOption = 'notion' | 'name' | 'author' | 'scrapers';
 
-interface CountryOption {
+interface LanguageOption {
   value: string;
   label: string;
+  count: number;
 }
 
 interface SearchBarProps {
@@ -17,11 +18,11 @@ interface SearchBarProps {
   onSortChange: (value: SortOption) => void;
   languageFilter: string;
   onLanguageFilterChange: (value: string) => void;
-  languageOptions: CountryOption[];
+  languageOptions: LanguageOption[];
 }
 
 const sortOptions: Array<{ value: SortOption; label: string }> = [
-  { value: 'relevance', label: 'Relevance' },
+  { value: 'notion', label: 'Notion Order' },
   { value: 'name', label: 'Name' },
   { value: 'author', label: 'Author' },
   { value: 'scrapers', label: 'Scrapers' },
@@ -77,22 +78,23 @@ export const SearchBar = ({
           ))}
         </div>
 
-        <div className="country-filter-wrap" aria-label="Language filter">
+        <div className="language-folder-wrap" aria-label="Language folders">
+          <span className="language-folder-label">Language Folders</span>
           <button
             type="button"
-            className={`country-chip ${languageFilter === 'all' ? 'active' : ''}`}
+            className={`language-folder-chip ${languageFilter === 'all' ? 'active' : ''}`}
             onClick={() => onLanguageFilterChange('all')}
           >
-            All Languages
+            All Languages ({resultCount})
           </button>
           {languageOptions.map((language) => (
             <button
               key={language.value}
               type="button"
-              className={`country-chip ${languageFilter === language.value ? 'active' : ''}`}
+              className={`language-folder-chip ${languageFilter === language.value ? 'active' : ''}`}
               onClick={() => onLanguageFilterChange(language.value)}
             >
-              {language.label}
+              {language.label} ({language.count})
             </button>
           ))}
         </div>

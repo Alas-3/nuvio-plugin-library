@@ -176,6 +176,22 @@ const parseStringArray = (value: unknown): string[] => {
   return value.filter((item): item is string => typeof item === 'string');
 };
 
+const parseLanguageTags = (value: string): string[] => {
+  const normalized = value.trim();
+  if (!normalized) return ['Unknown'];
+
+  const parts = normalized
+    .split(/[|,/;+]/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return ['Unknown'];
+  }
+
+  return Array.from(new Set(parts));
+};
+
 const isManifestScraperRecord = (value: unknown): value is ManifestScraperRecord =>
   Boolean(value) && typeof value === 'object';
 
@@ -261,7 +277,8 @@ export const useNotionProviders = (pageId: string) => {
           if (!name) continue;
 
           const url = getCellLink(repoCell);
-          const language = getCellText(langCell) || 'Unknown';
+          const language = getCellText(langCell);
+          const tags = parseLanguageTags(language);
           const author = extractAuthor(url);
           const country = inferCountry(url);
 
@@ -274,7 +291,7 @@ export const useNotionProviders = (pageId: string) => {
             countryCode: country.countryCode,
             countryName: country.countryName,
             countryEmoji: country.countryEmoji,
-            tags: [language],
+            tags,
             scrapers: []
           });
         }

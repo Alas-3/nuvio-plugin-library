@@ -19,7 +19,7 @@ const normalizeText = (value: string) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-type SortOption = 'relevance' | 'name' | 'author' | 'scrapers';
+type SortOption = 'notion' | 'name' | 'author' | 'scrapers';
 
 const ANNOUNCEMENT = {
   status: 'ann' as const,
@@ -28,7 +28,7 @@ const ANNOUNCEMENT = {
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>('relevance');
+  const [sortBy, setSortBy] = useState<SortOption>('notion');
   const [languageFilter, setLanguageFilter] = useState('all');
   const { providers, loading, error } = useNotionProviders(NOTION_PAGE_ID);
 
@@ -46,14 +46,30 @@ function App() {
 
     return Array.from(deduped)
       .sort((a, b) => a.localeCompare(b))
-      .map((value) => ({ value, label: value }));
+      .map((value) => ({
+        value,
+        label: value,
+        count: providers.filter((provider) =>
+          provider.tags.some((tag) => tag.toLowerCase() === value.toLowerCase())
+        ).length,
+      }));
   }, [providers]);
 
   const filteredProviders = useMemo(() => {
     const normalizedQuery = normalizeText(searchQuery);
+    const languageCount = (provider: (typeof providers)[number]) =>
+      new Set(provider.tags.map((tag) => tag.toLowerCase())).size;
+    const isMultiLanguage = (provider: (typeof providers)[number]) => languageCount(provider) > 1;
+    const withPriority = (entries: Array<{ provider: (typeof providers)[number]; score: number; notionIndex: number }>) =>
+      entries.sort((a, b) => {
+        if (isMultiLanguage(a.provider) !== isMultiLanguage(b.provider)) {
+          return isMultiLanguage(a.provider) ? -1 : 1;
+        }
+        return a.notionIndex - b.notionIndex;
+      });
 
     const rankedProviders = providers
-      .map((provider) => {
+      .map((provider, notionIndex) => {
         const normalizedName = normalizeText(provider.name);
         const normalizedAuthor = normalizeText(provider.author);
         const normalizedTags = normalizeText(provider.tags.join(' '));
@@ -90,30 +106,62 @@ function App() {
 
         score += provider.scrapers.length * 8;
 
-        return { provider, score };
+        return { provider, score, notionIndex };
       })
-      .filter((entry): entry is { provider: (typeof providers)[number]; score: number } => entry !== null);
+      .filter((entry): entry is { provider: (typeof providers)[number]; score: number; notionIndex: number } => entry !== null);
+
+    if (sortBy === 'notion') {
+      return withPriority(rankedProviders).map((entry) => entry.provider);
+    }
 
     if (sortBy === 'name') {
       return rankedProviders
-        .sort((a, b) => a.provider.name.localeCompare(b.provider.name))
+        .sort((a, b) => {
+          if (isMultiLanguage(a.provider) !== isMultiLanguage(b.provider)) {
+            return isMultiLanguage(a.provider) ? -1 : 1;
+          }
+
+          const byName = a.provider.name.localeCompare(b.provider.name);
+          return byName !== 0 ? byName : a.notionIndex - b.notionIndex;
+        })
         .map((entry) => entry.provider);
     }
 
     if (sortBy === 'author') {
       return rankedProviders
-        .sort((a, b) => a.provider.author.localeCompare(b.provider.author))
+        .sort((a, b) => {
+          if (isMultiLanguage(a.provider) !== isMultiLanguage(b.provider)) {
+            return isMultiLanguage(a.provider) ? -1 : 1;
+          }
+
+          const byAuthor = a.provider.author.localeCompare(b.provider.author);
+          return byAuthor !== 0 ? byAuthor : a.notionIndex - b.notionIndex;
+        })
         .map((entry) => entry.provider);
     }
 
     if (sortBy === 'scrapers') {
       return rankedProviders
-        .sort((a, b) => b.provider.scrapers.length - a.provider.scrapers.length)
+        .sort((a, b) => {
+          if (isMultiLanguage(a.provider) !== isMultiLanguage(b.provider)) {
+            return isMultiLanguage(a.provider) ? -1 : 1;
+          }
+
+          const byScrapers = b.provider.scrapers.length - a.provider.scrapers.length;
+          return byScrapers !== 0 ? byScrapers : a.notionIndex - b.notionIndex;
+        })
         .map((entry) => entry.provider);
     }
 
     return rankedProviders
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => {
+        if (isMultiLanguage(a.provider) !== isMultiLanguage(b.provider)) {
+          return isMultiLanguage(a.provider) ? -1 : 1;
+        }
+
+        const byScore = b.score - a.score;
+        return byScore !== 0 ? byScore : a.notionIndex - b.notionIndex;
+      })
       .map((entry) => entry.provider);
   }, [languageFilter, providers, searchQuery, sortBy]);
 

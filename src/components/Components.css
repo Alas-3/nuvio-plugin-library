@@ -273,23 +273,33 @@
   border-color: rgba(167, 243, 209, 0.55);
 }
 
-.country-filter-wrap {
+.language-folder-wrap {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   overflow-x: auto;
   padding-bottom: 2px;
 }
 
-.country-filter-wrap::-webkit-scrollbar {
+.language-folder-wrap::-webkit-scrollbar {
   height: 6px;
 }
 
-.country-filter-wrap::-webkit-scrollbar-thumb {
+.language-folder-wrap::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.14);
   border-radius: 999px;
 }
 
-.country-chip {
+.language-folder-label {
+  color: var(--text-tertiary);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.language-folder-chip {
   border: 1px solid var(--surface-border);
   background: rgba(255, 255, 255, 0.03);
   color: var(--text-secondary);
@@ -300,7 +310,7 @@
   white-space: nowrap;
 }
 
-.country-chip.active {
+.language-folder-chip.active {
   color: #0f1d16;
   background: linear-gradient(145deg, #e7ffc4 0%, #cdf8e9 100%);
   border-color: rgba(209, 255, 176, 0.55);
