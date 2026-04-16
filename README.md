@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./public/NuvioLogo.png" alt="Nuvio" width="320" />
+<img src="./public/NuvioLogo.png" alt="Nuvio Plugins logo" width="320" />
 
 <h1>Nuvio Plugins</h1>
 
@@ -14,7 +14,7 @@
 </div>
 
 <p align="center">
-  <img src="./src/assets/hero.png" alt="Nuvio Plugins hero preview" width="900" />
+  <img src="./public/thumbnail.png" alt="Nuvio Plugins home page preview" width="860" />
 </p>
 
 ## About
