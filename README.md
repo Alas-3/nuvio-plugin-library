@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="./public/NuvioLogo.png" alt="Nuvio Plugins logo" width="320" />
+<img src="./public/NuvioLogo.png" alt="Nuvio logo" width="320" />
 
 <h1>Nuvio Plugins</h1>
 
@@ -14,7 +14,7 @@
 </div>
 
 <p align="center">
-  <img src="./public/thumbnail.png" alt="Nuvio Plugins home page preview" width="860" />
+  <img src="./public/thumbnail.png" alt="Nuvio Plugins home page showing search, filters, and provider cards" width="860" />
 </p>
 
 ## About
@@ -25,7 +25,7 @@ It gives the community one trusted place to discover plugins, compare metadata, 
 
 ## Why Nuvio Built This
 
-As the plugin ecosystem grew, provider data became harder to browse quickly across different sources. Nuvio Plugins solves that by presenting one official directory with live synced data and searchable scraper details.
+As the plugin ecosystem grew, provider data became harder to browse quickly across different sources. Nuvio Plugins solves that by presenting one official directory with live synchronized data and searchable scraper details.
 
 ## What It Does
 
@@ -75,7 +75,7 @@ npm run lint
 - The app requests Notion table data through `/api/notion/:pageId`.
 - It discovers plugin repository/manifest URLs from each row.
 - It fetches each provider `manifest.json` and normalizes scraper fields.
-- The UI renders providers and scraper cards from the synced payload.
+- The UI renders providers and scraper cards from the synchronized payload.
 
 ## Deploying
 
