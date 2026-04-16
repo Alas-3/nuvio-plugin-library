@@ -1,130 +1,92 @@
-# Nuvio Plugin Library
+<div align="center">
 
-A modern, searchable directory of Nuvio plugin providers and their scraper manifests.
+<img src="./public/NuvioLogo.png" alt="Nuvio" width="320" />
 
-## Features
+<h1>Nuvio Plugins</h1>
 
-- Live provider sync from the official Notion source page
-- Fast search across plugin name, author, and language tags
-- Sort by relevance, name, author, or scraper count
-- One-click manifest copy with direct open action
-- Responsive layout optimized for desktop and mobile
-- Expandable scraper details for each provider
+<p>The official plugin/add-on index for the Nuvio ecosystem.</p>
 
-## Tech Stack
+[![Stars](https://img.shields.io/github/stars/NuvioCommunity/plugins?style=for-the-badge)](https://github.com/NuvioCommunity/plugins/stargazers)
+[![Issues](https://img.shields.io/github/issues/NuvioCommunity/plugins?style=for-the-badge)](https://github.com/NuvioCommunity/plugins/issues)
 
-- React 19 + TypeScript
-- Vite 8
-- ESLint 9
-- Bun or npm for package management
+<p>Search providers fast, inspect scraper manifests, and install with confidence.</p>
 
-## Prerequisites
+</div>
+
+<p align="center">
+  <img src="./src/assets/hero.png" alt="Nuvio Plugins hero preview" width="900" />
+</p>
+
+## About
+
+Nuvio Plugins is a React + TypeScript web app that indexes plugin providers and their scraper manifests from Nuvio's official source data.
+
+It gives the community one trusted place to discover plugins, compare metadata, and open manifests directly.
+
+## Why Nuvio Built This
+
+As the plugin ecosystem grew, provider data became harder to browse quickly across different sources. Nuvio Plugins solves that by presenting one official directory with live synced data and searchable scraper details.
+
+## What It Does
+
+- Syncs provider data from the official Notion source.
+- Resolves provider manifests and extracts scraper metadata.
+- Supports fast search by provider, author, language, and country.
+- Includes sorting by relevance, provider name, author, and scraper count.
+- Offers quick actions to copy manifest links and open repositories.
+- Works across desktop and mobile layouts.
+
+## Requirements
 
 - Node.js 20+
-- Bun (recommended) or npm
+- npm or Bun
 
-## Local Development
+## Quick Start
 
-### 1. Install dependencies
-
-With Bun:
-
-```bash
-bun install
-```
-
-With npm:
+1. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 2. Run the app
-
-With Bun:
-
-```bash
-bun run dev
-```
-
-With npm:
+2. Run in development:
 
 ```bash
 npm run dev
 ```
 
-Then open the URL shown by Vite (usually http://localhost:5173).
+3. Open the local URL shown by Vite (usually `http://localhost:5173`).
 
 ## Build and Preview
 
-### Production build
-
-With Bun:
-
-```bash
-bun run build
-```
-
-With npm:
-
 ```bash
 npm run build
-```
-
-### Preview the production output
-
-With Bun:
-
-```bash
-bun run preview
-```
-
-With npm:
-
-```bash
 npm run preview
 ```
 
-## Linting
-
-With Bun:
-
-```bash
-bun run lint
-```
-
-With npm:
+## Lint
 
 ```bash
 npm run lint
 ```
 
-## How Provider Data Works
+## How Data Sync Works
 
-- The app pulls table data from a Notion page through `/api/notion/:pageId`
-- It discovers plugin repository/manifest URLs from that table
-- For each provider, it fetches `manifest.json` and extracts scraper metadata
-- The UI renders providers and scrapers dynamically from live data
+- The app requests Notion table data through `/api/notion/:pageId`.
+- It discovers plugin repository/manifest URLs from each row.
+- It fetches each provider `manifest.json` and normalizes scraper fields.
+- The UI renders providers and scraper cards from the synced payload.
 
 ## Deploying
 
-This project includes [vercel.json](vercel.json) rewrite rules for both API and SPA routing.
+This repository includes [vercel.json](vercel.json) rewrites for API proxying and SPA routing.
 
-Quick deploy flow:
+Typical deploy flow:
 
-1. Push the repository to GitHub.
-2. Import the project in Vercel.
-3. Keep the default Vite build command (`vite build`) through package scripts.
+1. Push to GitHub.
+2. Import the repository in Vercel.
+3. Keep the default package build script (`npm run build`).
 4. Deploy.
-
-## Provider Submission Tips
-
-To make a provider list entry useful:
-
-1. Ensure the manifest URL is valid and publicly reachable.
-2. Add clear scraper names and descriptions.
-3. Include `supportedTypes` and `contentLanguage` in every scraper.
-4. Keep logos lightweight and stable (PNG or SVG URLs).
 
 ## Project Structure
 
