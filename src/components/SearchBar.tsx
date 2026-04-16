@@ -22,7 +22,7 @@ interface SearchBarProps {
 }
 
 const sortOptions: Array<{ value: SortOption; label: string }> = [
-  { value: 'notion', label: 'Notion Order' },
+  { value: 'notion', label: 'Default Order' },
   { value: 'name', label: 'Name' },
   { value: 'author', label: 'Author' },
   { value: 'scrapers', label: 'Scrapers' },
